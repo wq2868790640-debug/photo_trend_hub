@@ -933,7 +933,7 @@ class DataManager {
     async _initDB() {
         const NS = this.NS;
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(NS, 3);
+            const request = indexedDB.open(NS, 4);
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
                 // 版本升级时清空旧数据，确保 data.json 的新数据能正常加载
@@ -990,21 +990,25 @@ class DataManager {
         });
     }
 
-    /* ---------- 公开：初始化（加载 IndexedDB → 没有则从 data.json 导入 → 否则种演示数据） ---------- */
+    /* ---------- 公开：初始化（优先 data.json → IndexedDB 缓存 → 兜底演示数据） ---------- */
     async init() {
         await this._ready;
-        await this._loadAll();
-        if (this.records.length === 0) {
-            // 尝试从同目录的 data.json 自动导入
-            const fromJSON = await this._tryLoadFromJSON();
-            if (fromJSON) {
-                console.log("[DataManager] ✅ 已从 data.json 自动导入 " + this.records.length + " 条记录");
-                return;
-            }
-            // 最后兜底：种 2 条演示数据
-            this._seedDefaultDemo();
-            await this._saveAll();
+        // 1. 优先从 data.json 加载（确保线上数据始终最新）
+        const fromJSON = await this._tryLoadFromJSON();
+        if (fromJSON) {
+            console.log("[DataManager] ✅ 已从 data.json 加载 " + this.records.length + " 条记录");
+            return;
         }
+        // 2. 尝试 IndexedDB 缓存
+        await this._loadAll();
+        if (this.records.length > 0) {
+            console.log("[DataManager] 📦 从 IndexedDB 缓存加载 " + this.records.length + " 条记录");
+            return;
+        }
+        // 3. 最后兜底：种 2 条演示数据
+        this._seedDefaultDemo();
+        await this._saveAll();
+        console.log("[DataManager] 🌱 已注入演示数据");
     }
 
     /* ---------- 尝试加载 data.json（发布到 GitHub Pages 后人人可见） ---------- */
