@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Photo Trend Hub · 当代与商业摄影趋势中台</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- FontAwesome 图标 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- 杂志衬线 + 现代无衬线 + 中文宋体 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script>
+// Tailwind 主题 · 美术馆白墙杂志调
+tailwind.config = {
+    theme: {
+        extend: {
+            fontFamily: {
+                serif: ['"Cormorant Garamond"','"Noto Serif SC"','serif'],
+                sans:  ['Inter','"Noto Serif SC"','system-ui','sans-serif'],
+                mono:  ['"JetBrains Mono"','monospace']
+            },
+            colors: {
+                paper:      '#fafaf8',  // 主背景：暖米白
+                'paper-soft':'#f0eeea', // 次背景：淡米灰
+                ink:        '#0a0a0a',  // 主文字：带温度的深炭
+                'ink-soft': '#5a5754',  // 副文字
+                'ink-mute': '#a8a39c',  // 极小标 · 占位符
+                line:       '#e8e6e0',  // 1px 分割线
+                'line-strong':'#0a0a0a' // hover 描边
+            },
+            letterSpacing: {
+                tightest: '-0.04em',
+                editorial:'0.18em',
+                wider2:   '0.3em'
+            }
+        }
+    }
+};
+</script>
+
+<style>
+    /* ============================================================= */
+    /* 美术馆白墙 · 杂志 Editorial 范式                                 */
+    /* ============================================================= */
+    html, body {
+        background: #fafaf8;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        color: #0a0a0a;
+        font-family: 'Inter', 'Noto Serif SC', system-ui, sans-serif;
+        font-weight: 400;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* 容器宽度 */
+    .container-x { max-width: 1440px; margin-left:auto; margin-right:auto; padding-left: clamp(1rem, 4vw, 4rem); padding-right: clamp(1rem, 4vw, 4rem); }
+    .container-narrow { max-width: 1200px; margin-left:auto; margin-right:auto; padding-left: clamp(1rem, 4vw, 4rem); padding-right: clamp(1rem, 4vw, 4rem); }
+
+    /* 衬线大字 · 杂志主标语法 */
+    h1, h2, h3, .serif {
+        font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+        font-feature-settings: "liga" 1, "kern" 1;
+    }
+    .serif-italic { font-style: italic; font-weight: 300; }
+
+    /* 极小标 · 杂志小标语法 */
+    .eyebrow {
+        font-family: 'Inter', sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #5a5754;
+    }
+    .eyebrow-mute { color: #a8a39c; }
+
+    /* hairline 杂志感细线 */
+    .hairline        { border: 1px solid #e8e6e0; }
+    .hairline-b      { border-bottom: 1px solid #e8e6e0; }
+    .hairline-t      { border-top: 1px solid #e8e6e0; }
+    .hairline-strong { border: 1px solid #0a0a0a; }
+
+    /* 输入框 · 极致克制 */
+    input, select, textarea {
+        background: transparent;
+        color: #0a0a0a;
+        border: 0;
+        outline: 0;
+        border-bottom: 1px solid #d8d5cf;
+        padding: 8px 0;
+        width: 100%;
+        font-family: inherit;
+        transition: border-color 240ms ease;
+    }
+    input:focus, select:focus, textarea:focus {
+        border-bottom-color: #0a0a0a;
+    }
+    select option { background:#fafaf8; color:#0a0a0a; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+    input[type=number] { -moz-appearance: textfield; }
+    ::placeholder { color: #a8a39c; }
+
+    /* 自定义滚动条（白底版） */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d8d5cf; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a39c; }
+
+    /* ============================================================= */
+    /* 横版 Editorial 卡片（核心改造）                                  */
+    /* ============================================================= */
+    .editorial-card {
+        display: grid;
+        grid-template-columns: 5fr 4fr;
+        gap: clamp(2rem, 5vw, 5rem);
+        align-items: end;            /* 关键：文字与图片底对齐 */
+        padding: clamp(2.5rem, 6vw, 5rem) 0;
+        border-bottom: 1px solid #e8e6e0;
+    }
+    .editorial-card:last-child { border-bottom: 0; }
+    @media (max-width: 768px) {
+        .editorial-card {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+    }
+
+    .editorial-img-wrap {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        overflow: hidden;
+        background: #f0eeea;
+    }
+    .editorial-img-wrap img {
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        transition: transform 1200ms cubic-bezier(.2,.7,.2,1);
+    }
+    .editorial-card:hover .editorial-img-wrap img { transform: scale(1.025); }
+
+    /* 占位艺术块 */
+    .art-placeholder {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        background:
+            linear-gradient(135deg, rgba(0,0,0,0.025) 0%, transparent 100%),
+            repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 12px);
+        color: #a8a39c;
+    }
+
+    /* 卡片标题：衬线大字 */
+    .editorial-title {
+        font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+        font-size: clamp(1.4rem, 2.4vw, 2rem);
+        font-weight: 500;
+        line-height: 1.35;
+        color: #0a0a0a;
+        letter-spacing: -0.005em;
+    }
+
+    /* hover 时浮现的元数据带 */
+    .editorial-meta {
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 500ms ease, transform 500ms cubic-bezier(.2,.7,.2,1);
+    }
+    .editorial-card:hover .editorial-meta {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ============================================================= */
+    /* Tabs · 杂志类目栏                                               */
+    /* ============================================================= */
+    .tab-btn {
+        position: relative;
+        font-family: 'Inter', sans-serif;
+        font-size: 11.5px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #5a5754;
+        padding: 12px 0;
+        white-space: nowrap;
+        transition: color 280ms ease;
+    }
+    .tab-btn::after {
+        content:'';
+        position: absolute;
+        left: 50%;
+        bottom: -1px;
+        width: 0; height: 1px;
+        background: #0a0a0a;
+        transition: width 360ms cubic-bezier(.2,.7,.2,1), left 360ms cubic-bezier(.2,.7,.2,1);
+    }
+    .tab-btn:hover { color: #0a0a0a; }
+    .tab-btn.is-active { color: #0a0a0a; }
+    .tab-btn.is-active::after { width: 100%; left: 0; }
+
+    /* ============================================================= */
+    /* 按钮 · 极简描边                                                 */
+    /* ============================================================= */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: .55rem;
+        padding: .7rem 1.2rem;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #0a0a0a;
+        background: transparent;
+        border: 1px solid #0a0a0a;
+        cursor: pointer;
+        transition: all 280ms ease;
+    }
+    .btn:hover {
+        background: #0a0a0a;
+        color: #fafaf8;
+    }
+    .btn-primary {
+        background: #0a0a0a;
+        color: #fafaf8;
+        border-color: #0a0a0a;
+    }
+    .btn-primary:hover {
+        background: #fafaf8;
+        color: #0a0a0a;
+    }
+    .btn-ghost {
+        border-color: #d8d5cf;
+        color: #5a5754;
+    }
+    .btn-ghost:hover {
+        border-color: #0a0a0a;
+        color: #0a0a0a;
+        background: transparent;
+    }
+    .btn-danger:hover {
+        background: #0a0a0a;
+        color: #fafaf8;
+    }
+
+    /* CTA 反白按钮（用于 Hero 2 黑底白字） */
+    .btn-on-dark {
+        color: #fafaf8;
+        border-color: #fafaf8;
+        background: transparent;
+    }
+    .btn-on-dark:hover {
+        background: #fafaf8;
+        color: #0a0a0a;
+    }
+
+    /* ============================================================= */
+    /* Chip · 极简标签                                                 */
+    /* ============================================================= */
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: 3px 10px;
+        font-size: 10.5px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #5a5754;
+        background: transparent;
+        border: 1px solid #d8d5cf;
+        border-radius: 999px;
+    }
+    .chip-strong {
+        color: #0a0a0a;
+        border-color: #0a0a0a;
+    }
+
+    /* ============================================================= */
+    /* 索引序号（杂志感）                                               */
+    /* ============================================================= */
+    .index-num {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 300;
+        font-style: italic;
+        letter-spacing: -0.02em;
+        color: #a8a39c;
+    }
+
+    /* 情绪权重 mini bar */
+    .mood-bar { height: 1px; background: #e8e6e0; overflow:hidden; }
+    .mood-bar > span { display:block; height:100%; background:#0a0a0a; }
+
+    /* 入场动画 */
+    @keyframes riseIn {
+        from { opacity:0; transform: translateY(20px); }
+        to   { opacity:1; transform: translateY(0); }
+    }
+    .rise-in { animation: riseIn 800ms cubic-bezier(.2,.7,.2,1) both; }
+
+    /* Hero 2 主标入场（缓慢上浮 + blur 渐显） */
+    @keyframes heroFadeIn {
+        from { opacity:0; transform: translateY(24px); filter: blur(6px); }
+        to   { opacity:1; transform: translateY(0);    filter: blur(0); }
+    }
+    .hero-fade { animation: heroFadeIn 1400ms cubic-bezier(.2,.7,.2,1) both; }
+
+    /* 滚动指示符脉动 */
+    @keyframes scrollHint {
+        0%,100% { opacity: .4; transform: translateY(0); }
+        50%     { opacity: 1;  transform: translateY(6px); }
+    }
+    .scroll-hint { animation: scrollHint 2.4s ease-in-out infinite; }
+
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display:none; }
+
+    /* 链接通用 */
+    a { color: inherit; text-decoration: none; }
+    a:hover { color: #0a0a0a; }
+
+    /* 选中态 */
+    ::selection { background: #0a0a0a; color: #fafaf8; }
+</style>
+</head>
+<body class="font-sans">
+
+<!-- ============================================================= -->
+<!-- 极细顶栏 · 杂志刊头                                              -->
+<!-- ============================================================= -->
+<nav class="hairline-b">
+    <div class="container-x py-4 flex items-center justify-between gap-6">
+        <div class="flex items-center gap-2 text-ink-soft">
+            <i class="fa-solid fa-camera-retro text-[14px]"></i>
+            <span class="eyebrow">Photo Trend Hub</span>
+        </div>
+        <div class="hidden md:flex items-center gap-8">
+            <a href="#hero" class="eyebrow hover:text-ink transition">序</a>
+            <a href="#manifesto" class="eyebrow hover:text-ink transition">关于</a>
+            <a href="#workspace" class="eyebrow hover:text-ink transition">中台</a>
+            <a href="#archive" class="eyebrow hover:text-ink transition">档案</a>
+        </div>
+        <div class="flex items-center gap-3 text-ink-soft">
+            <span id="stat-total" class="eyebrow">— Sources</span>
+            <span class="text-line">·</span>
+            <span id="stat-time" class="eyebrow font-mono normal-case tracking-normal">—</span>
+        </div>
+    </div>
+</nav>
+
+
+<!-- ============================================================= -->
+<!-- HERO 1 · 左图右文 Editorial 序言                                 -->
+<!-- ============================================================= -->
+<section id="hero" class="container-x pt-16 md:pt-24 pb-20 md:pb-32">
+
+    <!-- 巨大主标 · 杂志刊名感 -->
+    <div class="text-center mb-16 md:mb-24">
+        <div class="flex items-center justify-center gap-4 mb-6">
+            <span class="inline-block w-10 h-px bg-ink/40"></span>
+            <span class="eyebrow">Issue 01 — Contemporary Photography Atlas</span>
+            <span class="inline-block w-10 h-px bg-ink/40"></span>
+        </div>
+        <h1 class="serif text-[clamp(3rem,9vw,7.5rem)] leading-[0.95] tracking-tightest text-ink">
+            Photo Trend Hub
+        </h1>
+        <p class="serif serif-italic mt-5 text-[clamp(1.1rem,1.6vw,1.4rem)] text-ink-soft tracking-tight">
+            一座关于当代影像与商业摄影的私人档案室。
+        </p>
+    </div>
+
+    <!-- 左图右文 Editorial -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-end">
+
+        <!-- 左：4:5 当代/时尚摄影竖图 -->
+        <figure class="md:col-span-6 rise-in">
+            <div class="relative w-full overflow-hidden bg-paper-soft" style="aspect-ratio: 4/5;">
+                <img
+                    src="https://chilong-prd-bj.vmic.xyz/user-upload-image/3b395705-4916-486d-8fe8-3992264467f7.jpg"
+                    alt="Contemporary editorial portrait · monochrome profile"
+                    class="absolute inset-0 w-full h-full object-cover">
+            </div>
+            <figcaption class="eyebrow eyebrow-mute mt-3 flex items-center gap-2">
+                <span class="inline-block w-4 h-px bg-ink-mute"></span>
+                <span>Plate I · Editorial Reference</span>
+            </figcaption>
+        </figure>
+
+        <!-- 右：编辑序言 -->
+        <div class="md:col-span-6 rise-in" style="animation-delay:120ms">
+
+            <div class="eyebrow mb-6">序 · Editorial Note</div>
+
+            <h2 class="serif text-[clamp(1.8rem,2.6vw,2.6rem)] leading-[1.25] tracking-tightest text-ink mb-8">
+                当代摄影与时尚摄影，一个向上追问，一个向下渗透——
+                <span class="text-ink-soft">每一次画廊先锋的微小转身，都将在下一季的 campaign 中找到回声。</span>
+            </h2>
+
+            <div class="space-y-5 text-[14px] md:text-[15px] leading-[1.85] text-ink-soft max-w-prose">
+                <p>
+                    当代摄影，始于对"摄影何为"的持续追问——
+                    它不再满足于记录眼见之物，而是以镜头为笔，在纪实与观念的边界上书写新的视觉语法。
+                    从 1960 年代 <span class="text-ink">New Topographics</span> 的冷面凝视，
+                    到 21 世纪 <span class="text-ink">AI 生成影像</span> 对"作者性"的挑战，
+                    每一次范式转移都在重新定义摄影与真实的关系。
+                </p>
+                <p>
+                    时尚摄影，则是商业与艺术最激烈的交锋地带。
+                    它既是品牌欲望的发动机，也是时代审美的晴雨表——
+                    <span class="text-ink">Helmut Newton</span> 的权力女性、
+                    <span class="text-ink">Paolo Roversi</span> 的柔纱诗学、
+                    <span class="text-ink">Glen Luchford</span> 的叙事大片，
+                    每一位摄影师都在用快门重新回答同一个问题："衣服穿在谁身上、活在哪个世界里？"
+                </p>
+                <p>
+                    本档案室的工作方法基于三个正交维度：
+                    信息源类型学界定对象身份，
+                    视觉语法分析拆解图像背后的技术决策，
+                    商业降维周期预测其在视觉产业中的扩散速率。
+                </p>
+                <p class="serif serif-italic text-ink text-[16px] md:text-[17px] pt-2">
+                    "We do not collect images. We collect the gestures that precede them."
+                </p>
+            </div>
+
+            <!-- CTA 行 -->
+            <div class="mt-10 flex flex-wrap items-center gap-4">
+                <a href="#manifesto" class="btn btn-primary">
+                    继续阅读
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+                <a href="#workspace" class="btn btn-ghost">
+                    跳至中台
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 滚动提示 -->
+    <div class="mt-24 md:mt-32 flex justify-center scroll-hint">
+        <div class="flex flex-col items-center gap-2 text-ink-mute">
+            <span class="eyebrow eyebrow-mute">Continue</span>
+            <i class="fa-solid fa-chevron-down text-[10px]"></i>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================= -->
+<!-- HERO 2 · 全屏黑白沉浸式 Manifesto                                -->
+<!-- ============================================================= -->
+<section id="manifesto" class="relative w-screen h-screen overflow-hidden -mx-[max(0px,calc((100vw-100%)/2))]">
+    <!-- 黑白底图：21:9 山海超宽幅 · 上半屏风景层 / 下半屏天然黑底文字层 -->
+    <img
+        src="https://chilong-prd-bj.vmic.xyz/user-upload-image/dd9ee62c-9a7f-4d4a-97e7-478c4d99d4f4.jpg"
+        alt="Manifesto backdrop · monochrome landscape"
+        class="absolute inset-0 w-full h-full object-cover"
+        style="filter: grayscale(1) brightness(0.93) contrast(1.05);">
+
+    <!-- 文字层：极简上下分层 · 顶部刊头 + 底部黑底文字组 -->
+    <div class="relative h-full hero-fade">
+
+        <!-- ① 顶部刊头：4vh → 落在最顶端 0-8% 极浅灰天空区，深色刊头 -->
+        <div class="absolute left-0 right-0 flex items-center justify-center gap-4"
+             style="top: 4.5vh;">
+            <span class="inline-block w-12 h-px" style="background:rgba(10,10,10,0.42)"></span>
+            <span class="eyebrow" style="color:rgba(10,10,10,0.72)">Contemporary · Trend Atlas</span>
+            <span class="inline-block w-12 h-px" style="background:rgba(10,10,10,0.42)"></span>
+        </div>
+
+        <!-- ② 主文字组：紧凑垂直堆叠，整段锁在底部 25vh 内
+             → 从 bottom: 8vh 起向上延伸约 26vh，全部落在前山黑剪影色面上
+             → 主标使用单行（无 br）以缩短垂直高度，避免顶到 S 曲线弧上方
+        -->
+        <div class="absolute left-0 right-0 px-6 md:px-10 flex flex-col items-center text-center"
+             style="bottom: 8vh;">
+
+            <h2 class="serif font-light text-white text-[clamp(1.7rem,4.4vw,4rem)] leading-[1.12] tracking-tightest max-w-5xl">
+                <span class="block">收纳每一道 <span class="serif-italic">当代影像</span> 的 视觉锚点</span>
+                <span class="block serif-italic text-white/92 mt-1">从画廊先锋，到商业终章。</span>
+            </h2>
+
+            <span class="inline-block w-10 h-px mt-6 mb-5" style="background:rgba(255,255,255,0.55)"></span>
+
+            <p class="max-w-xl text-white/88 text-[12.5px] md:text-[13.5px] leading-[1.85]"
+               style="font-family:'Inter',sans-serif;">
+                一个为视觉趋势中台而生的私人档案工具——采集你心动的每一帧，
+                用专业语法标注它，让一年后的你仍能精准复盘其降维路径。
+            </p>
+
+            <div class="mt-6">
+                <a href="#workspace" class="btn btn-on-dark">
+                    进入档案
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- ③ 底部刊注：贴底 2.5vh → 最深纯黑区 -->
+        <div class="absolute left-0 right-0 flex justify-center"
+             style="bottom: 2.5vh;">
+            <div class="flex items-center gap-3 eyebrow" style="color:rgba(255,255,255,0.5)">
+                <span class="inline-block w-6 h-px" style="background:rgba(255,255,255,0.38)"></span>
+                <span>Plate II · Manifesto</span>
+                <span class="inline-block w-6 h-px" style="background:rgba(255,255,255,0.38)"></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================= -->
+<!-- 工作区 · Workspace                                              -->
+<!-- ============================================================= -->
+<main id="workspace" class="container-x pt-24 md:pt-32 pb-40">
+
+    <!-- 工作区刊头 -->
+    <div class="text-center mb-16 md:mb-24">
+        <div class="flex items-center justify-center gap-4 mb-5">
+            <span class="inline-block w-10 h-px bg-ink/40"></span>
+            <span class="eyebrow">The Workspace</span>
+            <span class="inline-block w-10 h-px bg-ink/40"></span>
+        </div>
+        <h2 class="serif text-[clamp(2.4rem,5vw,4rem)] leading-[1.05] tracking-tightest text-ink">
+            档案 <span class="serif-italic">·</span> 中台
+        </h2>
+        <p class="serif serif-italic mt-4 text-[clamp(0.95rem,1.3vw,1.15rem)] text-ink-soft">
+            采集 · 标注 · 聚类 · 周报。
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+
+        <!-- ============== 左：录入面板（Sticky） ============== -->
+        <aside class="lg:col-span-4 xl:col-span-3">
+            <div class="lg:sticky lg:top-8">
+                <div class="flex items-baseline justify-between gap-3 mb-6 pb-4 border-b border-line">
+                    <div class="flex items-baseline gap-3">
+                        <span class="index-num text-2xl">01</span>
+                        <h3 class="serif text-[20px] text-ink tracking-tight">录入</h3>
+                    </div>
+                    <button type="button" id="btn-open-bookmarklet"
+                        class="eyebrow text-ink-mute hover:text-ink transition flex items-center gap-1.5"
+                        title="安装一键收藏书签">
+                        <i class="fa-solid fa-bookmark text-[10px]"></i>
+                        <span>Bookmarklet</span>
+                    </button>
+                </div>
+
+                <form id="entry-form" class="space-y-6">
+
+                    <div>
+                        <label class="eyebrow eyebrow-mute block mb-2">Source Name</label>
+                        <input type="text" id="f-name" required placeholder="Re-Edition Magazine Issue 22…">
+                    </div>
+
+                    <div>
+                        <label class="eyebrow eyebrow-mute block mb-2">URL</label>
+                        <input type="url" id="f-url" required placeholder="https://…">
+                    </div>
+
+                    <!-- AI 策展分析 -->
+                    <div>
+                        <label class="eyebrow eyebrow-mute block mb-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-ink-soft mr-1.5"></i>AI 策展分析
+                        </label>
+                        <textarea id="f-ai-input" rows="4" placeholder="粘贴外部 AI 输出的完整分析结果…"></textarea>
+                        <button type="button" id="btn-ai-parse" class="btn btn-ghost w-full justify-center mt-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> 一键识别填充
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="eyebrow eyebrow-mute block mb-2">Type · 维度</label>
+                            <select id="f-type" required></select>
+                        </div>
+                        <div>
+                            <label class="eyebrow eyebrow-mute block mb-2">Media · 媒介</label>
+                            <select id="f-media" required></select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="eyebrow eyebrow-mute block mb-2">Keywords</label>
+                        <input type="text" id="f-keywords" placeholder="Wet Look, Post-Internet, Hyperreal Skin">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="eyebrow eyebrow-mute block mb-2">Lighting</label>
+                            <select id="f-lighting"></select>
+                        </div>
+                        <div>
+                            <label class="eyebrow eyebrow-mute block mb-2">Color DNA</label>
+                            <select id="f-grading"></select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="eyebrow eyebrow-mute block mb-2">
+                            Commercial Decay <span class="normal-case tracking-normal text-ink-mute">(月)</span>
+                        </label>
+                        <input type="number" id="f-decay" min="0" max="120" value="18">
+                        <p class="text-[11px] text-ink-mute mt-2 leading-relaxed">
+                            画廊艺术下沉为大众商业语言的预测周期。0-6 已商业化 · 6-18 正在被借鉴 · 18+ 仍前卫。
+                        </p>
+                    </div>
+
+                    <details class="border border-line">
+                        <summary class="px-3 py-2.5 eyebrow flex items-center justify-between hover:bg-paper-soft transition">
+                            <span><i class="fa-solid fa-chart-simple mr-2 text-ink-soft"></i>Visual Mood Weight</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-ink-mute"></i>
+                        </summary>
+                        <div class="px-3 pb-3 pt-2 border-t border-line">
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-[12px]">
+                                <label class="flex flex-col gap-1"><span class="eyebrow eyebrow-mute">忧郁 Melancholy</span><input type="number" id="f-mood-melancholy" min="0" max="100" value="0"></label>
+                                <label class="flex flex-col gap-1"><span class="eyebrow eyebrow-mute">欢愉 Euphoria</span><input type="number" id="f-mood-euphoria" min="0" max="100" value="0"></label>
+                                <label class="flex flex-col gap-1"><span class="eyebrow eyebrow-mute">克制 Austerity</span><input type="number" id="f-mood-austerity" min="0" max="100" value="0"></label>
+                                <label class="flex flex-col gap-1"><span class="eyebrow eyebrow-mute">感官 Sensuality</span><input type="number" id="f-mood-sensuality" min="0" max="100" value="0"></label>
+                                <label class="flex flex-col gap-1 col-span-2"><span class="eyebrow eyebrow-mute">反乌托邦 Dystopia</span><input type="number" id="f-mood-dystopia" min="0" max="100" value="0"></label>
+                            </div>
+                        </div>
+                    </details>
+
+                    <div>
+                        <label class="eyebrow eyebrow-mute block mb-2">Curator Note</label>
+                        <textarea id="f-note" rows="3" placeholder="作为中台专家的洞察、流派归属、潜在客户匹配…"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="eyebrow eyebrow-mute block mb-2">Reference Image</label>
+                        <label id="f-image-dropzone" for="f-image" class="border border-line flex items-center gap-3 px-3 py-3 cursor-pointer hover:bg-paper-soft transition">
+                            <i class="fa-solid fa-camera text-ink text-base"></i>
+                            <span id="f-image-status" class="text-[12.5px] text-ink-soft">点击或拖拽上传 · 自动 Base64 内嵌</span>
+                        </label>
+                        <input type="file" id="f-image" accept=".png,.jpg,.jpeg,.webp,.gif,.bmp,.tiff" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-2">
+                        <button type="submit" id="btn-submit" class="btn btn-primary flex-1 justify-center">
+                            <i class="fa-solid fa-check text-[10px]"></i> 存入档案
+                        </button>
+                        <button type="reset" class="btn btn-ghost">重置</button>
+                    </div>
+                </form>
+            </div>
+        </aside>
+
+        <!-- ============== 右：过滤 + 列表 ============== -->
+        <section class="lg:col-span-8 xl:col-span-9">
+
+            <!-- 过滤区 -->
+            <div class="mb-12">
+                <div class="flex items-baseline gap-3 mb-6 pb-4 border-b border-line">
+                    <span class="index-num text-2xl">02</span>
+                    <h3 class="serif text-[20px] text-ink tracking-tight">交叉过滤</h3>
+                </div>
+
+                <!-- Type Tabs · 杂志类目栏 -->
+                <div class="flex items-center gap-7 overflow-x-auto border-b border-line pb-0 mb-6" id="type-tabs"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+                    <div class="md:col-span-4">
+                        <label class="eyebrow eyebrow-mute block mb-2">媒介 Media</label>
+                        <select id="filter-media"></select>
+                    </div>
+                    <div class="md:col-span-6">
+                        <label class="eyebrow eyebrow-mute block mb-2">关键词 / 流派 / 情绪</label>
+                        <input type="text" id="filter-keyword" placeholder="Wet Look · Roversi · Bleach Bypass…">
+                    </div>
+                    <div class="md:col-span-2 flex md:justify-end">
+                        <button id="btn-clear-filter" class="btn btn-ghost w-full md:w-auto justify-center">
+                            <i class="fa-solid fa-rotate-left text-[10px]"></i> 清空
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex items-center justify-between eyebrow eyebrow-mute">
+                    <span id="filter-summary">Loading…</span>
+                    <span class="hidden md:inline-flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-ink animate-pulse"></span>
+                        Async Engine Ready
+                    </span>
+                </div>
+            </div>
+
+            <!-- 列表 -->
+            <div id="archive" class="flex items-baseline gap-3 mb-2 pb-4 border-b border-line">
+                <span class="index-num text-2xl">03</span>
+                <h3 class="serif text-[20px] text-ink tracking-tight">已采集信息源</h3>
+            </div>
+
+            <div id="list-container"></div>
+
+        </section>
+    </div>
+</main>
+
+
+<!-- ============================================================= -->
+<!-- 底部浮动栏 · 白色毛玻璃 + 黑描边                                  -->
+<!-- ============================================================= -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[min(96vw,1000px)]">
+    <div class="bg-paper/85 backdrop-blur-xl border border-ink px-3 py-2 flex items-center gap-2"
+         style="box-shadow: 0 20px 60px -20px rgba(0,0,0,0.18);">
+
+        <div class="hidden sm:flex items-center gap-2 px-3 eyebrow text-ink">
+            <i class="fa-solid fa-newspaper text-[11px]"></i>
+            <span>Weekly Report</span>
+        </div>
+        <div class="hidden sm:block w-px h-5 bg-line"></div>
+
+        <button id="btn-export-md" class="btn btn-primary !py-2.5">
+            <i class="fa-solid fa-clipboard text-[10px]"></i>
+            <span>复制 Markdown 周报</span>
+        </button>
+
+        <button id="btn-export-json" class="btn btn-ghost !py-2.5" title="导出 JSON 备份">
+            <i class="fa-solid fa-file-arrow-down text-[10px]"></i>
+            <span class="hidden md:inline">JSON</span>
+        </button>
+        <button id="btn-import-json" class="btn btn-ghost !py-2.5" title="导入 JSON">
+            <i class="fa-solid fa-file-arrow-up text-[10px]"></i>
+            <span class="hidden md:inline">导入</span>
+        </button>
+        <input type="file" id="import-json-file" accept="application/json" class="hidden">
+
+        <div class="flex-1 min-w-0 px-3 text-right truncate text-[11px] text-ink-soft font-mono" id="export-status">就绪</div>
+
+        <button id="btn-clear-all" class="btn btn-ghost btn-danger !py-2.5 !px-3" title="清空全部">
+            <i class="fa-solid fa-trash text-[10px]"></i>
+        </button>
+    </div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- Bookmarklet 安装弹层 · 白调                                     -->
+<!-- ============================================================= -->
+<div id="bookmarklet-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-ink/60 backdrop-blur-md p-4">
+    <div class="bg-paper border border-ink max-w-2xl w-full p-10 relative" style="box-shadow: 0 40px 100px -30px rgba(0,0,0,0.4);">
+        <button id="btn-close-bookmarklet" class="absolute top-5 right-5 text-ink-soft hover:text-ink transition text-lg" title="关闭">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="flex items-center gap-3 mb-4 eyebrow">
+            <span class="inline-block w-8 h-px bg-ink/60"></span>
+            <span>Browser Extension · Zero Install</span>
+        </div>
+
+        <h3 class="serif text-[clamp(1.8rem,3vw,2.6rem)] text-ink leading-[1.15] tracking-tightest mb-4">
+            一键收藏 <span class="serif-italic text-ink-soft">Bookmarklet</span>
+        </h3>
+
+        <p class="text-[13.5px] leading-[1.85] text-ink-soft mb-8">
+            把下方按钮 <span class="text-ink">拖到浏览器书签栏</span>。之后浏览任意摄影网站时，点击它即可
+            <span class="text-ink">自动抓取当前页 URL、标题、首张图片</span>，跳回中台并预填表单。
+            <span class="block mt-2 text-ink-mute text-[12px]">仅需补全 4 个专业判断字段，录入摩擦降低 70%。</span>
+        </p>
+
+        <!-- 拖拽源 -->
+        <div class="flex items-center justify-center py-10 bg-paper-soft mb-8 border border-line">
+            <a id="bookmarklet-link" href="#"
+                class="btn btn-primary cursor-grab active:cursor-grabbing"
+                onclick="return false;">
+                <i class="fa-solid fa-camera-retro text-[11px]"></i>
+                <span>+ Photo Trend Hub</span>
+            </a>
+        </div>
+
+        <!-- 使用步骤 -->
+        <ol class="space-y-4 text-[13px] text-ink-soft leading-[1.7]">
+            <li class="flex gap-4">
+                <span class="index-num text-2xl leading-none w-8 shrink-0">01</span>
+                <div>
+                    <strong class="text-ink font-medium">显示书签栏</strong>：Chrome / Edge 按
+                    <kbd class="font-mono text-[11px] px-1.5 py-0.5 bg-paper-soft border border-line">⌘ + Shift + B</kbd>，
+                    Safari 在「显示」菜单勾选「显示个人收藏栏」。
+                </div>
+            </li>
+            <li class="flex gap-4">
+                <span class="index-num text-2xl leading-none w-8 shrink-0">02</span>
+                <div>
+                    <strong class="text-ink font-medium">拖拽安装</strong>：把上方「+ Photo Trend Hub」按钮
+                    <span class="text-ink">直接拖到书签栏</span>。
+                </div>
+            </li>
+            <li class="flex gap-4">
+                <span class="index-num text-2xl leading-none w-8 shrink-0">03</span>
+                <div>
+                    <strong class="text-ink font-medium">日常使用</strong>：浏览 IGNANT / Re-Edition / 品牌官网时，
+                    看到心动画面，点书签栏的「+ Photo Trend Hub」即可。
+                </div>
+            </li>
+            <li class="flex gap-4">
+                <span class="index-num text-2xl leading-none w-8 shrink-0">04</span>
+                <div>
+                    <strong class="text-ink font-medium">补全标注</strong>：跳回中台后，URL / 标题 / 图片已自动填好。
+                    你只需选择 Type / Media / Lighting / Color DNA + 写一句批注 → 存入。
+                </div>
+            </li>
+        </ol>
+
+        <p class="mt-8 pt-5 border-t border-line text-[11.5px] text-ink-mute leading-relaxed">
+            <i class="fa-solid fa-shield-halved mr-1.5"></i>
+            隐私说明：Bookmarklet 在你点击时才执行，仅读取当前页的 <span class="font-mono">title / URL / 首图地址</span>，
+            不上传任何数据到外部服务器，全部跳转回本机 <span class="font-mono">file://</span> 路径。
+        </p>
+    </div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- JavaScript：保留全部原始硬核逻辑，只为渲染层注入新视觉             -->
+<!-- ============================================================= -->
+<script>
+"use strict";
+
+/* =================================================================
+ * PART A · 自主推演的数据模型 (Schema / Taxonomy)
+ *   三个正交维度：
+ *     1) TYPES        宏观专业维度（10 类）
+ *     2) MEDIA_FORMS  媒介形态（10 类）
+ *     3) 自主设计字段 商业降维周期 / 视觉情绪权重 / 布光流派 / 调色基因
+ *
+ *   每一类都精心匹配了 FontAwesome 图标，作为视觉总监级符号语言。
+ * ================================================================= */
+
+const SCHEMA = {
+
+    TYPES: [
+        // ─── 领导大框（6 个）───
+        { key:"PhotographyTheory",    label:"当代摄影理论",       en:"Photography Theory",        icon:"fa-solid fa-book-open" },
+        { key:"ContemporaryMaster",   label:"华人/国际当代名家",   en:"Contemporary Masters",       icon:"fa-solid fa-star" },
+        { key:"FashionCampaign",      label:"时尚大片/广告硬照",   en:"Fashion Campaign · Ad",     icon:"fa-solid fa-gem" },
+        { key:"TrendMagazine",        label:"趋势刊物",           en:"Trend Magazine",             icon:"fa-solid fa-newspaper" },
+        { key:"CommercialPhotographer",label:"商业摄影师档案",     en:"Commercial Photographer",    icon:"fa-solid fa-user-tie" },
+        { key:"IndustryPlatform",     label:"行业平台/社区",       en:"Industry Platform",          icon:"fa-solid fa-globe" },
+        // ─── 原有细类保留（7 个）───
+        { key:"StillLifeCommercial",  label:"商业静物/产品",       en:"Still Life · Commercial",    icon:"fa-solid fa-wine-bottle" },
+        { key:"FineArtGallery",       label:"先锋画廊艺术",        en:"Fine Art · Gallery",         icon:"fa-solid fa-palette" },
+        { key:"Documentary",          label:"纪实/人类学",         en:"Documentary",                icon:"fa-solid fa-mountain-sun" },
+        { key:"PortraitStudio",       label:"肖像/工作室",         en:"Portrait · Studio",          icon:"fa-solid fa-user" },
+        { key:"AIGeneratedImagery",   label:"AI 反向重构影像",     en:"AI · Diffusion Imagery",     icon:"fa-solid fa-wand-magic-sparkles" },
+        { key:"AnalogRevival",        label:"胶片复兴/暗房",       en:"Analog Revival",             icon:"fa-solid fa-film" },
+        { key:"ArchitectureSpace",    label:"建筑/空间影像",       en:"Architecture · Space",       icon:"fa-solid fa-building-columns" }
+    ],
+
+    MEDIA_FORMS: [
+        { key:"Monograph",             label:"个人画册",            icon:"fa-solid fa-book" },
+        { key:"PhotoBook",             label:"主题摄影书",          icon:"fa-solid fa-book-open" },
+        { key:"IndependentMagazine",   label:"独立刊物",            icon:"fa-solid fa-newspaper" },
+        { key:"TrendCommunity",        label:"趋势社区 / 策展博客", icon:"fa-solid fa-compass" },
+        { key:"BrandEditorial",        label:"品牌编辑站",          icon:"fa-solid fa-store" },
+        { key:"StudioWebsite",         label:"工作室 / 评论站",     icon:"fa-solid fa-pen-nib" },
+        { key:"GalleryArchive",        label:"画廊 / 美术馆档案",   icon:"fa-solid fa-landmark" },
+        { key:"CreatorPortfolio",      label:"创作者主页",          icon:"fa-solid fa-id-badge" },
+        { key:"AgencyRoster",          label:"经纪公司名册",        icon:"fa-solid fa-briefcase" },
+        { key:"AwardArchive",          label:"奖项档案",            icon:"fa-solid fa-trophy" },
+        { key:"InstitutionalDatabase", label:"机构数据库",          icon:"fa-solid fa-database" },
+        { key:"Newsletter",            label:"订阅简报 / Substack", icon:"fa-solid fa-envelope-open-text" }
+    ],
+
+    LIGHTING_SCHOOLS: [
+        { key:"PaoloRoversiSoftVeil",    label:"Paolo Roversi 软纱光" },
+        { key:"RembrandtClassic",        label:"伦勃朗古典三角光" },
+        { key:"HardStrobeY2K",           label:"Y2K 硬闪 / 直闪" },
+        { key:"AvailableLightDoc",       label:"现场自然光 · 纪实" },
+        { key:"MixedPracticalCinematic", label:"实用光混合 · 电影感" },
+        { key:"ButterflyBeautyDish",     label:"蝴蝶光 / 美人光" },
+        { key:"HighKeyEditorial",        label:"高调白底 (High-Key)" },
+        { key:"LowKeyChiaroscuro",       label:"低调明暗对比" },
+        { key:"NeonGelMaximalism",       label:"霓虹色片极繁主义" },
+        { key:"DiffusedOvercast",        label:"阴天漫射 · 北欧静谧" }
+    ],
+
+    COLOR_GRADING_DNA: [
+        { key:"KodakPortraWarm",          label:"Kodak Portra 暖肤调" },
+        { key:"FujiPro400HPastel",        label:"Fuji Pro 400H 粉蓝奶油" },
+        { key:"TealOrangeHollywood",      label:"Teal-Orange 好莱坞" },
+        { key:"DesaturatedNordic",        label:"去饱和北欧极简" },
+        { key:"HyperSaturatedMaximalist", label:"高饱和极繁主义" },
+        { key:"BleachBypassDesat",        label:"漂白旁路 (Bleach Bypass)" },
+        { key:"SepiaArchival",            label:"档案褐 (Sepia)" },
+        { key:"InfraredAerochrome",       label:"红外 Aerochrome" },
+        { key:"MonochromeSilverGelatin",  label:"银盐黑白" },
+        { key:"DigitalCleanCampaign",     label:"数字纯净商业感" }
+    ]
+};
+
+const MOOD_AXES = [
+    { key:"melancholy", label:"忧郁" },
+    { key:"euphoria",   label:"欢愉" },
+    { key:"austerity",  label:"克制" },
+    { key:"sensuality", label:"感官" },
+    { key:"dystopia",   label:"反乌托邦" }
+];
+
+
+/* =================================================================
+ * PART B · DataManager 核心类（IndexedDB 后端，告别 5MB 配额瓶颈）
+ * ================================================================= */
+
+class DataManager {
+
+    constructor(namespace) {
+        this.NS = namespace || "photo_trend_hub_v2";
+        this.records = [];
+        this._db = null;
+        this._ready = this._initDB();
+    }
+
+    /* ---------- IndexedDB 初始化 ---------- */
+    async _initDB() {
+        const NS = this.NS;
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(NS, 3);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                // 版本升级时清空旧数据，确保 data.json 的新数据能正常加载
+                if (db.objectStoreNames.contains('records')) {
+                    db.deleteObjectStore('records');
+                }
+                db.createObjectStore('records', { keyPath: 'id' });
+            };
+            request.onsuccess = (e) => {
+                this._db = e.target.result;
+                resolve();
+            };
+            request.onerror = (e) => {
+                console.error("[DataManager] IndexedDB 初始化失败", e);
+                reject(e);
+            };
+        });
+    }
+
+    /* ---------- 从 IndexedDB 加载全部记录 ---------- */
+    async _loadAll() {
+        await this._ready;
+        return new Promise((resolve) => {
+            const tx = this._db.transaction('records', 'readonly');
+            const store = tx.objectStore('records');
+            const request = store.getAll();
+            request.onsuccess = () => {
+                this.records = request.result || [];
+                resolve();
+            };
+            request.onerror = () => {
+                console.warn("[DataManager] 读取失败，将使用空数据集", request.error);
+                this.records = [];
+                resolve();
+            };
+        });
+    }
+
+    /* ---------- 全部记录写入 IndexedDB ---------- */
+    async _saveAll() {
+        await this._ready;
+        return new Promise((resolve, reject) => {
+            const tx = this._db.transaction('records', 'readwrite');
+            const store = tx.objectStore('records');
+            store.clear();
+            for (const r of this.records) {
+                store.put(r);
+            }
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => {
+                console.error("[DataManager] 保存失败", tx.error);
+                reject(tx.error);
+            };
+        });
+    }
+
+    /* ---------- 公开：初始化（加载 IndexedDB → 没有则从 data.json 导入 → 否则种演示数据） ---------- */
+    async init() {
+        await this._ready;
+        await this._loadAll();
+        if (this.records.length === 0) {
+            // 尝试从同目录的 data.json 自动导入
+            const fromJSON = await this._tryLoadFromJSON();
+            if (fromJSON) {
+                console.log("[DataManager] ✅ 已从 data.json 自动导入 " + this.records.length + " 条记录");
+                return;
+            }
+            // 最后兜底：种 2 条演示数据
+            this._seedDefaultDemo();
+            await this._saveAll();
+        }
+    }
+
+    /* ---------- 尝试加载 data.json（发布到 GitHub Pages 后人人可见） ---------- */
+    async _tryLoadFromJSON() {
+        try {
+            const resp = await fetch("data.json");
+            if (!resp.ok) return false;
+            const arr = await resp.json();
+            if (!Array.isArray(arr) || arr.length === 0) return false;
+            this.records = arr;
+            await this._saveAll();
+            return true;
+        } catch (e) {
+            console.warn("[DataManager] data.json 加载失败（本地演示数据生效）:", e.message);
+            return false;
+        }
+    }
+
+    _genId() {
+        return "rec_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+    }
+
+    async add(record) {
+        await this._ready;
+        const r = Object.assign({
+            id: this._genId(),
+            createdAt: new Date().toISOString()
+        }, record);
+        this.records.push(r);
+        try {
+            await this._saveAll();
+        } catch (e) {
+            // 回滚内存中的记录，避免 UI 与实际存储不一致
+            this.records.pop();
+            throw e;
+        }
+        return r;
+    }
+
+    async remove(id) {
+        await this._ready;
+        const before = this.records.length;
+        const removed = this.records.filter(r => r.id === id);
+        this.records = this.records.filter(r => r.id !== id);
+        if (this.records.length !== before) {
+            try {
+                await this._saveAll();
+            } catch (e) {
+                // 回滚
+                this.records.push(...removed);
+                throw e;
+            }
+        }
+    }
+
+    async update(id, record) {
+        await this._ready;
+        const idx = this.records.findIndex(r => r.id === id);
+        if (idx === -1) return false;
+        const backup = this.records[idx];
+        this.records[idx] = Object.assign({}, this.records[idx], record, {
+            id,
+            updatedAt: new Date().toISOString()
+        });
+        try {
+            await this._saveAll();
+        } catch (e) {
+            this.records[idx] = backup;
+            throw e;
+        }
+        return true;
+    }
+
+    get(id) {
+        return this.records.find(r => r.id === id) || null;
+    }
+
+    async clearAll() {
+        await this._ready;
+        const backup = [...this.records];
+        this.records = [];
+        try {
+            await this._saveAll();
+        } catch (e) {
+            this.records = backup;
+            throw e;
+        }
+    }
+
+    async importJSON(jsonStr) {
+        await this._ready;
+        const arr = JSON.parse(jsonStr);
+        if (!Array.isArray(arr)) throw new Error("JSON 格式错误：期望数组");
+        const backup = [...this.records];
+        this.records = arr;
+        try {
+            await this._saveAll();
+        } catch (e) {
+            this.records = backup;
+            throw e;
+        }
+    }
+
+    exportJSON() { return JSON.stringify(this.records, null, 2); }
+
+    /* ---------- 异步交叉过滤引擎 ---------- */
+    async filter({ type, media, keyword } = {}) {
+        await this._ready;
+        return new Promise(resolve => {
+            queueMicrotask(() => {
+                const kw = (keyword || "").trim().toLowerCase();
+                const result = this.records.filter(r => {
+                    if (type  && type  !== "__ALL__" && r.type  !== type)  return false;
+                    if (media && media !== "__ALL__" && r.media !== media) return false;
+                    if (kw) {
+                        const haystack = [
+                            r.name, r.url, r.note,
+                            (r.keywords || []).join(","),
+                            r.lightingSchool, r.colorGradingDNA
+                        ].join(" ").toLowerCase();
+                        if (!haystack.includes(kw)) return false;
+                    }
+                    return true;
+                });
+                resolve(result);
+            });
+        });
+    }
+
+    /* ---------- Markdown 周报：按 Type Group By ---------- */
+    toMarkdownGroupedByType() {
+        const groups = new Map();
+        for (const r of this.records) {
+            if (!groups.has(r.type)) groups.set(r.type, []);
+            groups.get(r.type).push(r);
+        }
+
+        const lightLabel = (k) => (SCHEMA.LIGHTING_SCHOOLS.find(t=>t.key===k)?.label) || k;
+        const gradeLabel = (k) => (SCHEMA.COLOR_GRADING_DNA.find(t=>t.key===k)?.label) || k;
+        const mediaLabel = (k) => (SCHEMA.MEDIA_FORMS.find(t=>t.key===k)?.label) || k;
+
+        let md = "";
+        md += "# 当代与商业摄影趋势周报\n\n";
+        md += "> 生成时间：" + new Date().toLocaleString() + "  \n";
+        md += "> 信息源总数：" + this.records.length + "  \n";
+        md += "> 聚类维度：宏观专业维度 (Type) Group By\n\n---\n\n";
+
+        for (const t of SCHEMA.TYPES) {
+            const list = groups.get(t.key);
+            if (!list || list.length === 0) continue;
+
+            md += "## " + t.label + " · " + t.en + "  （共 " + list.length + " 条）\n\n";
+
+            list.forEach((r, idx) => {
+                md += "### " + (idx + 1) + ". " + r.name + "\n\n";
+                md += "- **原始链接**：" + (r.url || "—") + "\n";
+                md += "- **媒介形态**：" + mediaLabel(r.media) + "\n";
+                md += "- **趋势关键词**：" + ((r.keywords || []).join(", ") || "—") + "\n";
+                md += "- **核心布光流派**：" + lightLabel(r.lightingSchool) + "\n";
+                md += "- **调色基因**：" + gradeLabel(r.colorGradingDNA) + "\n";
+                md += "- **商业降维周期预测**：" + (r.commercialDecayCycle ?? "—") + " 个月\n";
+
+                if (r.visualMoodWeight) {
+                    const mw = r.visualMoodWeight;
+                    md += "- **视觉情绪权重**："
+                        + "忧郁 " + (mw.melancholy || 0) + " · "
+                        + "欢愉 " + (mw.euphoria   || 0) + " · "
+                        + "克制 " + (mw.austerity  || 0) + " · "
+                        + "感官 " + (mw.sensuality || 0) + " · "
+                        + "反乌托邦 " + (mw.dystopia || 0) + "\n";
+                }
+                if (r.note) md += "- **评论家批注**：" + r.note.replace(/\n/g, " ") + "\n";
+                if (r.imageData) md += "\n![图例示意](" + r.imageData + ")\n";
+                md += "\n";
+            });
+            md += "---\n\n";
+        }
+        return md;
+    }
+
+    /* ---------- 默认演示数据：殿堂级中台样本 ---------- */
+    _seedDefaultDemo() {
+        this.records.push({
+            id: this._genId(),
+            createdAt: new Date().toISOString(),
+            name: "Re-Edition Magazine · Issue 22 'The Wet Veil'",
+            url: "https://re-edition.com/",
+            type: "FashionCampaign",
+            media: "IndependentMagazine",
+            keywords: ["Wet Look", "Post-Glamour", "Soft Veil", "Skin Texture"],
+            lightingSchool: "PaoloRoversiSoftVeil",
+            colorGradingDNA: "FujiPro400HPastel",
+            commercialDecayCycle: 14,
+            visualMoodWeight: { melancholy:70, euphoria:10, austerity:55, sensuality:80, dystopia:15 },
+            note: "本期延续 Roversi 自 1990s 以来的'柔纱湿润'语法，但通过数字中间片加入了 Pro 400H 粉蓝奶油基底——这是过去 18 个月独立刊物对'后魅力 Post-Glamour'最系统的总结。预测 12-14 个月内将被 Jacquemus、Diesel 等中端高奢借鉴用于香水/底妆品类。",
+            imageData: "https://images.unsplash.com/photo-1506634572416-48cdfe530110?w=1600&q=80"
+        });
+
+        this.records.push({
+            id: this._genId(),
+            createdAt: new Date().toISOString(),
+            name: "IGNANT · Architectural Stillness Series",
+            url: "https://www.ignant.com/category/photography/",
+            type: "TrendMagazine",
+            media: "TrendCommunity",
+            keywords: ["Brutalist", "Negative Space", "Nordic Light", "Stillness"],
+            lightingSchool: "DiffusedOvercast",
+            colorGradingDNA: "DesaturatedNordic",
+            commercialDecayCycle: 24,
+            visualMoodWeight: { melancholy:50, euphoria:5, austerity:90, sensuality:10, dystopia:35 },
+            note: "IGNANT 在 2023-2024 持续策展的'静谧建筑'是地产、酒店、新中产家居品牌（Aesop、HAY、Vitra）共同的视觉公约数。其去饱和北欧调与漫射光，正在形成对'Teal-Orange 工业'的反向校准。建议中台将其作为'反极繁主义'锚点持续追踪。",
+            imageData: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1600&q=80"
+        });
+    }
+}
+
+
+/* =================================================================
+ * PART C · UI 控制器 —— 视觉总监版渲染层
+ * ================================================================= */
+
+const DM = new DataManager("photo_trend_hub_v2");
+let pendingImageBase64 = "";
+let pendingFileRead = null; // 追踪 FileReader Promise，避免异步竞态
+let currentTypeFilter = "__ALL__";
+let editingId = null; // 当前正在编辑的记录 ID，null 表示新增模式
+
+/* ---------- 安全转义 ---------- */
+function escapeHTML(s) {
+    return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function escapeAttr(s) { return escapeHTML(s).replace(/"/g, "&quot;"); }
+
+function findSchema(arr, k) { return arr.find(x => x.key === k); }
+function labelOf(arr, k)    { return findSchema(arr, k)?.label || k; }
+
+/* ---------- 注入下拉框 ---------- */
+function injectSelect(selectEl, items, withAll) {
+    selectEl.innerHTML = "";
+    if (withAll) {
+        const opt = document.createElement("option");
+        opt.value = "__ALL__"; opt.textContent = "全部";
+        selectEl.appendChild(opt);
+    }
+    items.forEach(it => {
+        const opt = document.createElement("option");
+        opt.value = it.key; opt.textContent = it.label;
+        selectEl.appendChild(opt);
+    });
+}
+
+function initAllSelects() {
+    injectSelect(document.getElementById("f-type"),     SCHEMA.TYPES,             false);
+    injectSelect(document.getElementById("f-media"),    SCHEMA.MEDIA_FORMS,       false);
+    injectSelect(document.getElementById("f-lighting"), SCHEMA.LIGHTING_SCHOOLS,  false);
+    injectSelect(document.getElementById("f-grading"),  SCHEMA.COLOR_GRADING_DNA, false);
+    injectSelect(document.getElementById("filter-media"), SCHEMA.MEDIA_FORMS, true);
+}
+
+/* ---------- 渲染 Type Tabs（带图标）---------- */
+function renderTypeTabs() {
+    const wrap = document.getElementById("type-tabs");
+    wrap.innerHTML = "";
+
+    const all = document.createElement("button");
+    all.className = "tab-btn whitespace-nowrap";
+    all.dataset.key = "__ALL__";
+    all.innerHTML = '<i class="fa-solid fa-asterisk text-[10px] mr-2 opacity-70"></i>All';
+    wrap.appendChild(all);
+
+    SCHEMA.TYPES.forEach(t => {
+        const b = document.createElement("button");
+        b.className = "tab-btn whitespace-nowrap";
+        b.dataset.key = t.key;
+        b.innerHTML = '<i class="' + t.icon + ' text-[11px] mr-2 opacity-70"></i>' + t.label;
+        wrap.appendChild(b);
+    });
+
+    wrap.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            currentTypeFilter = btn.dataset.key;
+            wrap.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("is-active"));
+            btn.classList.add("is-active");
+            applyFilterAndRender();
+        });
+    });
+
+    wrap.querySelector('.tab-btn[data-key="__ALL__"]').classList.add("is-active");
+}
+
+/* ---------- 卡片渲染：横版 Editorial 列表（美术馆图录式） ---------- */
+function renderList(list) {
+    const container = document.getElementById("list-container");
+    container.innerHTML = "";
+    document.getElementById("stat-total").textContent = DM.records.length + " Sources";
+
+    document.getElementById("filter-summary").textContent =
+        list.length + " / " + DM.records.length + "  RESULTS · ASYNC FILTERED";
+
+    if (list.length === 0) {
+        container.innerHTML =
+            '<div class="py-32 text-center">' +
+                '<i class="fa-regular fa-image text-3xl text-ink-mute"></i>' +
+                '<p class="eyebrow eyebrow-mute mt-5">No matching sources</p>' +
+            '</div>';
+        return;
+    }
+
+    list.forEach((r, i) => {
+        const typeMeta  = findSchema(SCHEMA.TYPES, r.type);
+        const mediaMeta = findSchema(SCHEMA.MEDIA_FORMS, r.media);
+        const card = document.createElement("article");
+        card.className = "editorial-card rise-in";
+        card.style.animationDelay = Math.min(i * 80, 480) + "ms";
+
+        // ---------- 左：横版 16:10 图像区 ----------
+        const imgBlock = r.imageData
+            ? '<img src="' + escapeAttr(r.imageData) + '" alt="' + escapeAttr(r.name) + '" loading="lazy">'
+            : '<div class="art-placeholder">' +
+                '<div class="text-center">' +
+                    '<i class="fa-regular fa-image text-2xl"></i>' +
+                    '<p class="eyebrow eyebrow-mute mt-3">No Reference</p>' +
+                '</div>' +
+              '</div>';
+
+        // ---------- 情绪权重 mini bars（前 2 名）----------
+        let moodHTML = "";
+        if (r.visualMoodWeight) {
+            const sorted = MOOD_AXES
+                .map(a => ({ key:a.key, label:a.label, val: r.visualMoodWeight[a.key] || 0 }))
+                .sort((a,b) => b.val - a.val).slice(0, 2);
+            moodHTML = sorted.map(m =>
+                '<div class="flex items-center gap-2 text-[11px] text-ink-soft">' +
+                    '<span class="w-14 shrink-0">' + m.label + '</span>' +
+                    '<div class="mood-bar flex-1"><span style="width:' + m.val + '%"></span></div>' +
+                    '<span class="w-6 text-right font-mono text-ink-mute">' + m.val + '</span>' +
+                '</div>'
+            ).join("");
+        }
+
+        const decay = r.commercialDecayCycle ?? 0;
+        const decayTone = decay <= 6 ? "已商业化" : decay <= 18 ? "正被借鉴" : "仍前卫";
+        const decayChipClass = decay <= 18 ? "chip chip-strong" : "chip";
+
+        const typeIcon  = typeMeta?.icon  || "fa-solid fa-circle";
+        const mediaIcon = mediaMeta?.icon || "fa-solid fa-circle";
+        const typeLabel  = typeMeta?.label  || r.type;
+        const mediaLabel = mediaMeta?.label || r.media;
+
+        // 截断 note 用于副文（约 90 个字符）
+        const noteSnippet = r.note
+            ? (r.note.length > 90 ? escapeHTML(r.note.slice(0, 90)) + '…' : escapeHTML(r.note))
+            : '';
+
+        // ---------- 卡片内容（左图 / 右文底对齐）----------
+        card.innerHTML =
+            // ===== 左：图像 =====
+            '<div class="editorial-img-wrap">' +
+                imgBlock +
+                '<span class="absolute top-3 left-3 eyebrow text-white mix-blend-difference" style="font-size:10px">' +
+                    String(i+1).padStart(2,'0') +
+                '</span>' +
+            '</div>' +
+
+            // ===== 右：文字 =====
+            '<div class="flex flex-col">' +
+
+                // 小标 —— Type · Media
+                '<div class="eyebrow flex items-center gap-3 mb-5">' +
+                    '<i class="' + typeIcon + ' text-[11px]"></i>' +
+                    '<span>' + typeLabel + '</span>' +
+                    '<span class="text-ink-mute">·</span>' +
+                    '<span class="text-ink-soft">' + mediaLabel + '</span>' +
+                '</div>' +
+
+                // 主标：衬线大字
+                '<h3 class="editorial-title mb-4">' +
+                    '<a href="' + escapeAttr(r.url) + '" target="_blank" rel="noopener" class="hover:text-ink-soft transition">' +
+                        escapeHTML(r.name) +
+                    '</a>' +
+                '</h3>' +
+
+                // 副文：批注节选
+                (noteSnippet
+                    ? '<p class="text-[14px] leading-[1.75] text-ink-soft mb-6 max-w-prose">' + noteSnippet + '</p>'
+                    : '') +
+
+                // ===== Hover 显影区：专业元数据 =====
+                '<div class="editorial-meta border-t border-line pt-5 mt-2 space-y-4">' +
+
+                    // 关键词
+                    ((r.keywords || []).length
+                        ? '<div class="flex flex-wrap gap-1.5">' +
+                            r.keywords.map(k => '<span class="chip">' + escapeHTML(k) + '</span>').join("") +
+                          '</div>'
+                        : '') +
+
+                    // Lighting + Color DNA + Decay 三栏
+                    '<div class="grid grid-cols-3 gap-5 text-[12px]">' +
+                        '<div>' +
+                            '<div class="eyebrow eyebrow-mute mb-1.5">Lighting</div>' +
+                            '<div class="text-ink leading-snug">' + escapeHTML(labelOf(SCHEMA.LIGHTING_SCHOOLS, r.lightingSchool)) + '</div>' +
+                        '</div>' +
+                        '<div>' +
+                            '<div class="eyebrow eyebrow-mute mb-1.5">Color DNA</div>' +
+                            '<div class="text-ink leading-snug">' + escapeHTML(labelOf(SCHEMA.COLOR_GRADING_DNA, r.colorGradingDNA)) + '</div>' +
+                        '</div>' +
+                        '<div>' +
+                            '<div class="eyebrow eyebrow-mute mb-1.5">Decay</div>' +
+                            '<div class="text-ink leading-snug">' + decay + ' mo · ' + decayTone + '</div>' +
+                        '</div>' +
+                    '</div>' +
+
+                    // 情绪权重前 2 项
+                    (moodHTML ? '<div class="space-y-1.5 max-w-sm">' + moodHTML + '</div>' : '') +
+
+                    // 底部：URL + 编辑/删除
+                    '<div class="flex items-center justify-between pt-3 border-t border-line">' +
+                        '<a href="' + escapeAttr(r.url) + '" target="_blank" rel="noopener" class="eyebrow eyebrow-mute hover:text-ink transition flex items-center gap-1.5 truncate max-w-[55%]">' +
+                            '<i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>' +
+                            '<span class="truncate normal-case tracking-normal text-[11.5px] font-mono">' + escapeHTML(r.url) + '</span>' +
+                        '</a>' +
+                        '<div class="flex items-center gap-4">' +
+                            '<button data-edit="' + r.id + '" class="eyebrow eyebrow-mute hover:text-ink transition flex items-center gap-1.5" title="编辑">' +
+                                '<i class="fa-solid fa-pen-to-square text-[10px]"></i>' +
+                                '<span>Edit</span>' +
+                            '</button>' +
+                            '<button data-del="' + r.id + '" class="eyebrow eyebrow-mute hover:text-ink transition flex items-center gap-1.5" title="删除">' +
+                                '<i class="fa-solid fa-xmark text-[10px]"></i>' +
+                                '<span>Remove</span>' +
+                            '</button>' +
+                        '</div>' +
+                    '</div>' +
+
+                '</div>' +
+            '</div>';
+
+        container.appendChild(card);
+    });
+
+    container.querySelectorAll("button[data-del]").forEach(btn => {
+        btn.addEventListener("click", async (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            if (confirm("确认删除该信息源？")) {
+                await DM.remove(btn.getAttribute("data-del"));
+                applyFilterAndRender();
+            }
+        });
+    });
+
+    container.querySelectorAll("button[data-edit]").forEach(btn => {
+        btn.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            const id = btn.getAttribute("data-edit");
+            const rec = DM.get(id);
+            if (!rec) return;
+            fillFormWithRecord(rec);
+            document.getElementById("entry-form").scrollIntoView({ behavior: "smooth", block: "start" });
+            document.getElementById("f-name").focus();
+        });
+    });
+}
+
+async function applyFilterAndRender() {
+    const media   = document.getElementById("filter-media").value;
+    const keyword = document.getElementById("filter-keyword").value;
+    const list = await DM.filter({ type: currentTypeFilter, media, keyword });
+    list.reverse();
+    renderList(list);
+}
+
+/* ---------- 表单 ---------- */
+
+/** 在 SCHEMA 数组中按 label 模糊匹配 key（容错：中文简写/英文近似） */
+function matchSchemaKey(arr, raw) {
+    if (!raw) return "";
+    const s = raw.trim();
+    // 精确匹配 key
+    const exact = arr.find(x => x.key === s);
+    if (exact) return exact.key;
+    // 精确匹配 label
+    const lbl = arr.find(x => x.label === s);
+    if (lbl) return lbl.key;
+    // 包含匹配
+    const inc = arr.find(x => s.includes(x.label) || x.label.includes(s.slice(0, 4)));
+    if (inc) return inc.key;
+    return s; // fallback：保留原始值
+}
+
+/** 解析外部 AI 输出文本，回填所有表单字段 */
+function parseAITextAndFill(raw) {
+    if (!raw || !raw.trim()) {
+        flashStatus("请先粘贴 AI 分析结果");
+        return;
+    }
+    const text = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+    // 兼容两种格式：同行冒号（【Label】：Value）和分行（【Label】\nValue）
+    const patterns = [
+        { key: "Source Name",   re: /【Source\s*Name】\s*[:：]?\s*/ },
+        { key: "URL",           re: /【URL】\s*[:：]?\s*/ },
+        { key: "Type",          re: /【Type】\s*[:：]?\s*/ },
+        { key: "Media",         re: /【Media】\s*[:：]?\s*/ },
+        { key: "Keywords",      re: /【Keywords】\s*[:：]?\s*/ },
+        { key: "Lighting",      re: /【Lighting】\s*[:：]?\s*/ },
+        { key: "Color DNA",     re: /【Color\s*DNA】\s*[:：]?\s*/ },
+        { key: "Decay",         re: /【Decay】\s*[:：]?\s*/ },
+        { key: "Melancholy",    re: /【Melancholy】\s*[:：]?\s*/ },
+        { key: "Euphoria",      re: /【Euphoria】\s*[:：]?\s*/ },
+        { key: "Austerity",     re: /【Austerity】\s*[:：]?\s*/ },
+        { key: "Sensuality",    re: /【Sensuality】\s*[:：]?\s*/ },
+        { key: "Dystopia",      re: /【Dystopia】\s*[:：]?\s*/ },
+        { key: "Curator Note",  re: /【Curator\s*Note】\s*[:：]?\s*/ },
+    ];
+
+    const values = {};
+    for (let i = 0; i < patterns.length; i++) {
+        const p = patterns[i];
+        const match = text.match(p.re);
+        if (!match) continue;
+        let start = match.index + match[0].length;
+        // 找到下一个【的位置作为结束
+        const nextMatch = text.slice(start).match(/【/);
+        let end = nextMatch ? start + nextMatch.index : text.length;
+        // 去掉首尾空白和换行，多行压缩为一行
+        values[p.key] = text.slice(start, end)
+            .replace(/^[\s\n\r]+/, "")
+            .replace(/[\s\n\r]+$/, "")
+            .replace(/\n+/g, " ");
+    }
+
+    let filled = 0;
+
+    if (values["Source Name"]) {
+        document.getElementById("f-name").value = values["Source Name"];
+        filled++;
+    }
+    if (values["URL"]) {
+        document.getElementById("f-url").value = values["URL"];
+        filled++;
+    }
+    if (values["Type"]) {
+        const t = matchSchemaKey(SCHEMA.TYPES, values["Type"]);
+        if (t) { document.getElementById("f-type").value = t; filled++; }
+    }
+    if (values["Media"]) {
+        const m = matchSchemaKey(SCHEMA.MEDIA_FORMS, values["Media"]);
+        if (m) { document.getElementById("f-media").value = m; filled++; }
+    }
+    if (values["Keywords"]) {
+        document.getElementById("f-keywords").value = values["Keywords"];
+        filled++;
+    }
+    if (values["Lighting"]) {
+        const l = matchSchemaKey(SCHEMA.LIGHTING_SCHOOLS, values["Lighting"]);
+        if (l) { document.getElementById("f-lighting").value = l; filled++; }
+    }
+    if (values["Color DNA"]) {
+        const c = matchSchemaKey(SCHEMA.COLOR_GRADING_DNA, values["Color DNA"]);
+        if (c) { document.getElementById("f-grading").value = c; filled++; }
+    }
+    if (values["Decay"]) {
+        const d = parseInt(values["Decay"], 10);
+        if (!isNaN(d)) { document.getElementById("f-decay").value = d; filled++; }
+    }
+    if (values["Melancholy"])  { document.getElementById("f-mood-melancholy").value = values["Melancholy"]; filled++; }
+    if (values["Euphoria"])    { document.getElementById("f-mood-euphoria").value   = values["Euphoria"];   filled++; }
+    if (values["Austerity"])   { document.getElementById("f-mood-austerity").value  = values["Austerity"];  filled++; }
+    if (values["Sensuality"])  { document.getElementById("f-mood-sensuality").value = values["Sensuality"]; filled++; }
+    if (values["Dystopia"])    { document.getElementById("f-mood-dystopia").value   = values["Dystopia"];   filled++; }
+    if (values["Curator Note"]) {
+        document.getElementById("f-note").value = values["Curator Note"];
+        filled++;
+    }
+
+    flashStatus("✓ 已识别填充 " + filled + " 个字段");
+}
+
+/** 将记录数据回填到录入面板 */
+function fillFormWithRecord(rec) {
+    editingId = rec.id;
+    document.getElementById("f-name").value     = rec.name || "";
+    document.getElementById("f-url").value      = rec.url || "";
+    document.getElementById("f-type").value     = rec.type || "";
+    document.getElementById("f-media").value    = rec.media || "";
+    document.getElementById("f-keywords").value = (rec.keywords || []).join(", ");
+    document.getElementById("f-lighting").value = rec.lightingSchool || "";
+    document.getElementById("f-grading").value  = rec.colorGradingDNA || "";
+    document.getElementById("f-decay").value    = rec.commercialDecayCycle ?? 0;
+    if (rec.visualMoodWeight) {
+        document.getElementById("f-mood-melancholy").value = rec.visualMoodWeight.melancholy || 0;
+        document.getElementById("f-mood-euphoria").value   = rec.visualMoodWeight.euphoria   || 0;
+        document.getElementById("f-mood-austerity").value  = rec.visualMoodWeight.austerity  || 0;
+        document.getElementById("f-mood-sensuality").value = rec.visualMoodWeight.sensuality || 0;
+        document.getElementById("f-mood-dystopia").value   = rec.visualMoodWeight.dystopia   || 0;
+    }
+    document.getElementById("f-note").value = rec.note || "";
+    pendingImageBase64 = rec.imageData || "";
+    pendingFileRead = null; // 编辑回填时重置异步读取状态
+    const fileStatus = document.getElementById("f-image-status");
+    if (rec.imageData) {
+        fileStatus.textContent = "✓ 已有图片 · 点击或拖拽可替换";
+    } else {
+        fileStatus.textContent = "点击或拖拽上传 · 自动 Base64 内嵌";
+    }
+    // 切换提交按钮文案
+    const submitBtn = document.getElementById("btn-submit");
+    submitBtn.innerHTML = '<i class="fa-solid fa-check text-[10px]"></i> 更新';
+    // 在重置按钮旁加一个"取消编辑"
+    const resetBtn = document.querySelector("#entry-form button[type='reset']");
+    if (!document.getElementById("btn-cancel-edit")) {
+        const cancelBtn = document.createElement("button");
+        cancelBtn.type = "button";
+        cancelBtn.id = "btn-cancel-edit";
+        cancelBtn.className = "btn btn-ghost";
+        cancelBtn.innerHTML = '<i class="fa-solid fa-xmark text-[10px]"></i>';
+        resetBtn.parentNode.insertBefore(cancelBtn, resetBtn);
+        cancelBtn.addEventListener("click", exitEditMode);
+    }
+}
+
+/** 退出编辑模式，恢复为新增 */
+function exitEditMode() {
+    editingId = null;
+    document.getElementById("entry-form").reset();
+    pendingImageBase64 = "";
+    pendingFileRead = null;
+    document.getElementById("f-image-status").textContent = "点击或拖拽上传 · 自动 Base64 内嵌";
+    const submitBtn = document.getElementById("btn-submit");
+    submitBtn.innerHTML = '<i class="fa-solid fa-check text-[10px]"></i> 存入档案';
+    const cancelBtn = document.getElementById("btn-cancel-edit");
+    if (cancelBtn) cancelBtn.remove();
+}
+
+function bindEntryForm() {
+    const form = document.getElementById("entry-form");
+    const fileInput = document.getElementById("f-image");
+    const fileStatus = document.getElementById("f-image-status");
+
+    function handleFile(file) {
+        if (!file) {
+            fileStatus.textContent = "请选择图片文件";
+            pendingFileRead = null;
+            return;
+        }
+        // 有些浏览器/文件不返回 MIME type，检查扩展名作为兜底
+        const name = file.name.toLowerCase();
+        const validExts = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tiff"];
+        const isImage = file.type.startsWith("image/") || validExts.some(ext => name.endsWith(ext));
+        if (!isImage) {
+            fileStatus.textContent = "请选择图片文件";
+            pendingFileRead = null;
+            return;
+        }
+        pendingFileRead = new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                pendingImageBase64 = e.target.result;
+                fileStatus.textContent = "✓ " + file.name + " · " + (file.size/1024).toFixed(1) + " KB";
+                resolve(e.target.result);
+            };
+            reader.onerror = () => {
+                pendingImageBase64 = "";
+                fileStatus.textContent = "读取失败";
+                reject(reader.error);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    fileInput.addEventListener("change", () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) {
+            pendingImageBase64 = "";
+            pendingFileRead = null;
+            fileStatus.textContent = "点击或拖拽上传 · 自动 Base64 内嵌";
+            return;
+        }
+        handleFile(file);
+    });
+
+    // 拖拽上传支持
+    const dropzone = document.getElementById("f-image-dropzone");
+    ["dragenter", "dragover"].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add("border-ink");
+        });
+    });
+    ["dragleave", "drop"].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove("border-ink");
+        });
+    });
+    dropzone.addEventListener("drop", e => {
+        const dt = e.dataTransfer;
+        if (dt.files && dt.files.length) {
+            handleFile(dt.files[0]);
+        }
+    });
+
+    // 编辑模式下点击重置 → 退出编辑
+    const resetBtn = form.querySelector("button[type='reset']");
+    resetBtn.addEventListener("click", () => {
+        if (editingId) exitEditMode();
+    });
+
+    form.addEventListener("submit", async ev => {
+        ev.preventDefault();
+
+        // 等待文件读取完成，避免异步竞态导致图片丢失
+        if (pendingFileRead) {
+            fileStatus.textContent = "⌛ 正在处理图片…";
+            try {
+                await pendingFileRead;
+            } catch {
+                pendingImageBase64 = "";
+            }
+            pendingFileRead = null;
+        }
+
+        const keywords = document.getElementById("f-keywords").value
+            .split(",").map(s => s.trim()).filter(Boolean);
+
+        const record = {
+            name:  document.getElementById("f-name").value.trim(),
+            url:   document.getElementById("f-url").value.trim(),
+            type:  document.getElementById("f-type").value,
+            media: document.getElementById("f-media").value,
+            keywords,
+            lightingSchool:  document.getElementById("f-lighting").value,
+            colorGradingDNA: document.getElementById("f-grading").value,
+            commercialDecayCycle: Number(document.getElementById("f-decay").value) || 0,
+            visualMoodWeight: {
+                melancholy: Number(document.getElementById("f-mood-melancholy").value) || 0,
+                euphoria:   Number(document.getElementById("f-mood-euphoria").value)   || 0,
+                austerity:  Number(document.getElementById("f-mood-austerity").value)  || 0,
+                sensuality: Number(document.getElementById("f-mood-sensuality").value) || 0,
+                dystopia:   Number(document.getElementById("f-mood-dystopia").value)   || 0
+            },
+            note: document.getElementById("f-note").value.trim(),
+            imageData: pendingImageBase64 || ""
+        };
+
+        if (editingId) {
+            await DM.update(editingId, record);
+            flashStatus("✓ 已更新");
+            exitEditMode();
+        } else {
+            await DM.add(record);
+            flashStatus("✓ 已存入中台");
+            form.reset();
+            pendingImageBase64 = "";
+            fileStatus.textContent = "点击或拖拽上传 · 自动 Base64 内嵌";
+        }
+        applyFilterAndRender();
+    });
+}
+
+/* ---------- 过滤器联动 ---------- */
+function bindFilters() {
+    document.getElementById("filter-media").addEventListener("change", applyFilterAndRender);
+    document.getElementById("filter-keyword").addEventListener("input", applyFilterAndRender);
+    document.getElementById("btn-clear-filter").addEventListener("click", () => {
+        currentTypeFilter = "__ALL__";
+        document.querySelectorAll("#type-tabs .tab-btn").forEach(b => b.classList.remove("is-active"));
+        document.querySelector('#type-tabs .tab-btn[data-key="__ALL__"]').classList.add("is-active");
+        document.getElementById("filter-media").value = "__ALL__";
+        document.getElementById("filter-keyword").value = "";
+        applyFilterAndRender();
+    });
+}
+
+/* ---------- 浮动栏：导出 / 维护 ---------- */
+function flashStatus(msg) {
+    const el = document.getElementById("export-status");
+    el.textContent = msg;
+    el.classList.remove("text-ink-soft");
+    el.classList.add("text-ink");
+    clearTimeout(flashStatus._t);
+    flashStatus._t = setTimeout(() => {
+        el.classList.add("text-ink-soft");
+        el.classList.remove("text-ink");
+        el.textContent = "就绪";
+    }, 3200);
+}
+
+function bindExport() {
+    document.getElementById("btn-export-md").addEventListener("click", async () => {
+        const md = DM.toMarkdownGroupedByType();
+        try {
+            await navigator.clipboard.writeText(md);
+            flashStatus("✓ Markdown 已复制 · " + md.length.toLocaleString() + " 字符");
+        } catch {
+            const w = window.open("", "_blank");
+            w.document.write("<pre style='font-family:monospace;white-space:pre-wrap;padding:24px'>" + escapeHTML(md) + "</pre>");
+            flashStatus("浏览器禁止剪贴板写入 · 已在新窗口展示");
+        }
+    });
+
+    document.getElementById("btn-export-json").addEventListener("click", () => {
+        const json = DM.exportJSON();
+        const blob = new Blob([json], { type:"application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "photo_trend_hub_backup_" + Date.now() + ".json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+        flashStatus("✓ JSON 备份已下载");
+    });
+
+    const importInput = document.getElementById("import-json-file");
+    document.getElementById("btn-import-json").addEventListener("click", () => importInput.click());
+    importInput.addEventListener("change", async () => {
+        const file = importInput.files && importInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                await DM.importJSON(e.target.result);
+                applyFilterAndRender();
+                flashStatus("✓ 已导入 " + DM.records.length + " 条");
+            } catch (err) {
+                flashStatus("导入失败：" + err.message);
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    document.getElementById("btn-clear-all").addEventListener("click", async () => {
+        if (confirm("确认清空全部中台数据？此操作不可逆。")) {
+            await DM.clearAll();
+            applyFilterAndRender();
+            flashStatus("已清空 · 刷新页面将重新注入演示数据");
+        }
+    });
+}
+
+/* ---------- 顶部时间显示 ---------- */
+function startClock() {
+    const el = document.getElementById("stat-time");
+    const tick = () => {
+        const d = new Date();
+        const pad = n => String(n).padStart(2,'0');
+        el.textContent = d.getFullYear() + "." + pad(d.getMonth()+1) + "." + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+    };
+    tick();
+    setInterval(tick, 30000);
+}
+
+
+/* =================================================================
+ * PART D · Bookmarklet 模块
+ *
+ * 工作原理：
+ *   1. 生成一段 javascript: 协议代码，用户拖到书签栏
+ *   2. 点击书签时，在源网站抓取 title / location.href / 首图 src
+ *   3. 通过 URL hash 参数跳回 Photo Trend Hub
+ *      （用 # 而非 ?，避免某些浏览器对 file:// 查询参数的限制）
+ *   4. Hub 启动时检测 hash，自动预填表单 + 异步抓远程图转 Base64
+ * ================================================================= */
+
+const Bookmarklet = {
+
+    // ---------- 生成书签代码 ----------
+    // 注意：HUB_URL 使用当前页面真实地址，确保跨设备拖拽后仍能跳回正确路径
+    buildCode() {
+        const HUB_URL = location.href.split('#')[0]; // 去掉 hash，避免污染
+
+        // 这段代码会被注入用户书签 → 在任意网站执行
+        // 抓取策略：title + url + 优先用「右键复制的图片地址」（剪贴板）→ 否则首张大图
+        const code = `(function(){
+            var t = document.title || '';
+            var u = location.href;
+            var img = '';
+            // 策略 1：用户在源站选中的图片（通过 contextmenu target）
+            // 策略 2：当前页第一张面积 > 200x200 的 img
+            try {
+                var imgs = Array.from(document.images || []);
+                var big = imgs.find(function(i){
+                    return i.naturalWidth > 400 && i.naturalHeight > 300 && i.src;
+                });
+                if (big) img = big.currentSrc || big.src;
+            } catch(e){}
+            var hubBase = ${JSON.stringify(HUB_URL)};
+            var payload = encodeURIComponent(JSON.stringify({ t: t, u: u, i: img }));
+            window.open(hubBase + '#prefill=' + payload, '_blank');
+        })();`;
+
+        // 压缩空白，转成单行 javascript: URL
+        return 'javascript:' + encodeURIComponent(
+            code.replace(/\s+/g, ' ').trim()
+        );
+    },
+
+    // ---------- 绑定 UI：弹层开关 + 拖拽链接 ----------
+    bindUI() {
+        const modal = document.getElementById("bookmarklet-modal");
+        const link  = document.getElementById("bookmarklet-link");
+        const btnOpen  = document.getElementById("btn-open-bookmarklet");
+        const btnClose = document.getElementById("btn-close-bookmarklet");
+
+        // 把生成的 javascript: URL 写入拖拽源
+        link.href = this.buildCode();
+
+        const open  = () => { modal.classList.remove("hidden"); modal.classList.add("flex"); };
+        const close = () => { modal.classList.add("hidden");    modal.classList.remove("flex"); };
+
+        btnOpen.addEventListener("click", open);
+        btnClose.addEventListener("click", close);
+        modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && !modal.classList.contains("hidden")) close();
+        });
+    },
+
+    // ---------- 解析 hash 中的 prefill 数据 ----------
+    parsePrefill() {
+        const m = location.hash.match(/^#prefill=(.+)$/);
+        if (!m) return null;
+        try {
+            const data = JSON.parse(decodeURIComponent(m[1]));
+            // 立刻清掉 hash，避免刷新重复填充
+            history.replaceState(null, "", location.pathname);
+            return data;
+        } catch (e) {
+            console.warn("[Bookmarklet] prefill 解析失败：", e);
+            return null;
+        }
+    },
+
+    // ---------- 应用预填到表单 ----------
+    async applyPrefill(data) {
+        if (!data) return;
+
+        if (data.t) document.getElementById("f-name").value = data.t.slice(0, 200);
+        if (data.u) document.getElementById("f-url").value  = data.u;
+
+        // 异步抓远程图 → Base64（绕开手动上传步骤）
+        if (data.i) {
+            const fileStatus = document.getElementById("f-image-status");
+            fileStatus.textContent = "⌛ 正在从源站抓取图片…";
+            try {
+                const resp = await fetch(data.i, { mode: "cors" });
+                if (!resp.ok) throw new Error("HTTP " + resp.status);
+                const blob = await resp.blob();
+                if (blob.size > 8 * 1024 * 1024) throw new Error("图片过大 (>8MB)");
+                const base64 = await new Promise((res, rej) => {
+                    const r = new FileReader();
+                    r.onload = e => res(e.target.result);
+                    r.onerror = rej;
+                    r.readAsDataURL(blob);
+                });
+                pendingImageBase64 = base64;
+                fileStatus.textContent = "✓ 已自动抓取 · " + (blob.size/1024).toFixed(1) + " KB";
+            } catch (err) {
+                // 跨域被拦截是常态，给用户清晰提示
+                fileStatus.textContent = "⚠ 自动抓取失败（CORS 限制），请手动上传截图";
+                console.warn("[Bookmarklet] 图片抓取失败：", err);
+            }
+        }
+
+        // 滚到表单 + 高亮一下
+        document.getElementById("f-name").focus();
+        document.getElementById("entry-form").scrollIntoView({ behavior: "smooth", block: "start" });
+        flashStatus("✓ 已通过 Bookmarklet 预填，请补全专业字段");
+    }
+};
+
+
+/* =================================================================
+ * PART E · 启动
+ * ================================================================= */
+window.addEventListener("DOMContentLoaded", async () => {
+    // 必须先等待 IndexedDB 初始化完成 + 加载数据
+    await DM.init();
+
+    initAllSelects();
+    renderTypeTabs();
+    bindEntryForm();
+    bindFilters();
+    bindExport();
+    startClock();
+    applyFilterAndRender();
+
+    // AI 策展分析按钮
+    document.getElementById("btn-ai-parse").addEventListener("click", () => {
+        const raw = document.getElementById("f-ai-input").value;
+        parseAITextAndFill(raw);
+    });
+
+    // Bookmarklet 集成
+    Bookmarklet.bindUI();
+    const prefill = Bookmarklet.parsePrefill();
+    if (prefill) Bookmarklet.applyPrefill(prefill);
+
+    window.DM = DM;
+    window.SCHEMA = SCHEMA;
+    window.Bookmarklet = Bookmarklet;
+    console.log("%c[Photo Trend Hub] Ready · IndexedDB Backend", "color:#0a0a0a;font-weight:bold", "Records:", DM.records.length);
+});
+</script>
+
+</body>
+</html>
