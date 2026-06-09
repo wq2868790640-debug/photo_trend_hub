@@ -1,0 +1,14 @@
+【Source Name】：示例来源
+【URL】：https://example.com
+【Type】：FashionCampaign
+【Media】：BrandEditorial
+【Keywords】：Sample, Test, Demo
+【Lighting】：PaoloRoversiSoftVeil
+【Color DNA】：KodakPortraWarm
+【Decay】：12
+【Melancholy】：30
+【Euphoria】：40
+【Austerity】：20
+【Sensuality】：50
+【Dystopia】：10
+【Curator Note】：这是一个示例分析文件，用于测试共享文件加载功能。

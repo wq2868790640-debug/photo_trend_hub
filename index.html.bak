@@ -583,16 +583,9 @@ tailwind.config = {
                             <i class="fa-solid fa-wand-magic-sparkles text-ink-soft mr-1.5"></i>AI 策展分析
                         </label>
                         <textarea id="f-ai-input" rows="4" placeholder="粘贴外部 AI 输出的完整分析结果…"></textarea>
-                        <button type="button" id="btn-ai-parse" class="btn btn-ghost justify-center flex-1">
+                        <button type="button" id="btn-ai-parse" class="btn btn-ghost w-full justify-center mt-2">
                             <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> 一键识别填充
                         </button>
-                            <button type="button" id="btn-load-shared" class="btn btn-ghost justify-center" title="从共享文件夹加载分析文件">
-                                <i class="fa-solid fa-folder-open text-[10px]"></i> 共享文件
-                            </button>
-                        </div>
-                        <select id="shared-file-select" class="hidden mt-2 text-[12px]">
-                            <option value="">— 选择共享分析文件 —</option>
-                        </select>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -2011,33 +2004,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("btn-ai-parse").addEventListener("click", () => {
         const raw = document.getElementById("f-ai-input").value;
         parseAITextAndFill(raw);
-    });
-
-    // 共享文件加载按钮
-    const sharedSelect = document.getElementById("shared-file-select");
-    const btnLoadShared = document.getElementById("btn-load-shared");
-    btnLoadShared.addEventListener("click", async () => {
-        if (sharedSelect.classList.contains("hidden")) {
-            // 首次点击：加载文件列表
-            share            share            share            share            shareML             share            share            shar;
-             ry {
-                                                                       
-                                    new Er                                    new Er                                );
-                                                               选                              ion                                                                                                                    选        opt.                                                             txt"                               edSelect.ap                                });
-            } catch (e) {
-                sharedSelect.innerHTML = '<option value="">— 加载失败 —</option>';
-                console.warn("[Shared] 文件列表加载失败:", e);
-            }
-        } else {
-            sharedSelect.classList.add("hidden");
-        }
-    });
-    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSe     con    sharedSelit fe    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedro    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSelec    sharedSe").value = text;
-            parseAITextAndFill(text);
-            flashStatus("已加载共享文件并自动填充");
-        } catch (e) {
-            flashStatus("加载失败：" + e.message);
-        }
     });
 
     // Bookmarklet 集成
